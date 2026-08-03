@@ -123,3 +123,10 @@
     </script>
 </body>
 </html>
+.draggable {
+    /* ...原本的設定... */
+    touch-action: none;          /* 強制禁止任何系統處理 */
+    user-select: none;           /* 禁止選取文字（防止變形） */
+    -webkit-user-select: none;   /* iOS Safari 專用 */
+    -webkit-touch-callout: none; /* 禁止 iOS 長按選單 */
+}
