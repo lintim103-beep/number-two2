@@ -18,6 +18,81 @@
             padding-top: 50px;
         }
     </style>
+    <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>我的籃球場</title>
+    <style>
+        /* 球場地板 */
+        .court {
+            width: 600px;
+            height: 400px;
+            background-color: #d2a679; /* 木地板顏色 */
+            border: 5px solid white;
+            margin: 50px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 禁區 (罰球區) */
+        .key-area {
+            width: 120px;
+            height: 200px;
+            border: 3px solid white;
+            position: absolute;
+            left: 0;
+            top: 100px;
+        }
+
+        /* 罰球圈 (上半部) */
+        .free-throw-circle {
+            width: 120px;
+            height: 120px;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            left: 60px; /* 這裡對齊禁區邊緣 */
+            top: 140px;
+        }
+
+        /* 籃框與籃板 */
+        .hoop {
+            width: 10px;
+            height: 60px;
+            background-color: white;
+            position: absolute;
+            left: 0;
+            top: 170px;
+        }
+        
+        .rim {
+            width: 30px;
+            height: 30px;
+            border: 3px solid red;
+            border-radius: 50%;
+            position: absolute;
+            left: 10px;
+            top: 185px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="court">
+        <!-- 這是籃框 -->
+        <div class="hoop"></div>
+        <div class="rim"></div>
+        
+        <!-- 這是禁區 -->
+        <div class="key-area"></div>
+        
+        <!-- 這是罰球圈 -->
+        <div class="free-throw-circle"></div>
+    </div>
+
+</body>
+</html>
 </head>
 <body>
 </body>
