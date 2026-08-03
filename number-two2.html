@@ -22,74 +22,114 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>我的籃球場</title>
+    <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>全場籃球場</title>
     <style>
-        /* 球場地板 */
+        /* 整個球場容器 */
         .court {
-            width: 600px;
+            width: 800px;
             height: 400px;
-            background-color: #d2a679; /* 木地板顏色 */
+            background-color: #d2a679;
             border: 5px solid white;
             margin: 50px auto;
             position: relative;
             overflow: hidden;
         }
 
-        /* 禁區 (罰球區) */
-        .key-area {
+        /* 中線 */
+        .mid-line {
+            width: 2px;
+            height: 100%;
+            background-color: white;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 中圈 */
+        .center-circle {
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 共用禁區樣式 */
+        .key {
             width: 120px;
             height: 200px;
             border: 3px solid white;
             position: absolute;
-            left: 0;
             top: 100px;
         }
+        .key.left { left: 0; }
+        .key.right { right: 0; }
 
-        /* 罰球圈 (上半部) */
+        /* 罰球圈 (共用樣式) */
         .free-throw-circle {
             width: 120px;
             height: 120px;
             border: 3px solid white;
             border-radius: 50%;
             position: absolute;
-            left: 60px; /* 這裡對齊禁區邊緣 */
             top: 140px;
         }
+        .free-throw-circle.left { left: 60px; }
+        .free-throw-circle.right { right: 60px; }
 
-        /* 籃框與籃板 */
+        /* 籃框與籃板 (共用樣式) */
         .hoop {
             width: 10px;
             height: 60px;
             background-color: white;
             position: absolute;
-            left: 0;
             top: 170px;
         }
-        
         .rim {
             width: 30px;
             height: 30px;
             border: 3px solid red;
             border-radius: 50%;
             position: absolute;
-            left: 10px;
             top: 185px;
         }
+        
+        /* 左右籃框定位 */
+        .hoop.left { left: 0; }
+        .hoop.right { right: 0; }
+        .rim.left { left: 10px; }
+        .rim.right { right: 10px; }
     </style>
 </head>
 <body>
 
     <div class="court">
-        <!-- 這是籃框 -->
-        <div class="hoop"></div>
-        <div class="rim"></div>
-        
-        <!-- 這是禁區 -->
-        <div class="key-area"></div>
-        
-        <!-- 這是罰球圈 -->
-        <div class="free-throw-circle"></div>
+        <!-- 中場設施 -->
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+
+        <!-- 左側進攻端 -->
+        <div class="hoop left"></div>
+        <div class="rim left"></div>
+        <div class="key left"></div>
+        <div class="free-throw-circle left"></div>
+
+        <!-- 右側進攻端 -->
+        <div class="hoop right"></div>
+        <div class="rim right"></div>
+        <div class="key right"></div>
+        <div class="free-throw-circle right"></div>
     </div>
+
+</body>
+</html>
 
 </body>
 </html>
