@@ -16,6 +16,7 @@
             margin: 0; display: flex; justify-content: center; align-items: center; 
             height: 100vh; background: #2c3e50; font-family: sans-serif; 
             overflow: hidden; 
+            /* 關鍵：徹底鎖死瀏覽器預設捲動行為，防止拖曳變形 */
             overscroll-behavior: none; 
             touch-action: none;
         }
@@ -30,6 +31,7 @@
             width: 95vw; max-width: 900px; aspect-ratio: 2 / 1;
             background-color: #d2a679; border: 5px solid white; position: relative;
             border-radius: 10px; user-select: none; overflow: hidden; 
+            /* GPU 加速 */
             transform: translateZ(0);
         }
 
@@ -47,19 +49,14 @@
         .rim { width: 6%; aspect-ratio: 1/1; border: 3px solid #c0392b; border-radius: 50%; top: 42%; position: absolute; z-index: 5; }
         .rim.left { left: 1%; } .rim.right { right: 1%; }
         
-        /* 拖曳物件優化 (包含防變形設定) */
+        /* 拖曳物件優化 */
         .draggable {
             position: absolute; width: 6%; aspect-ratio: 1 / 1; cursor: grab;
             z-index: 10; border-radius: 50%; border: 2px solid white;
+            /* 關鍵：防止閃爍與變形 */
             will-change: transform; 
             transform: translateZ(0);
             transition: transform 0.05s linear;
-            
-            /* 修正後的防變形規則 */
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
         }
         .red { background-color: #e74c3c; }
         .blue { background-color: #3498db; }
