@@ -135,4 +135,101 @@
         });
     </script>
 </body>
-</html>
+</html><style>
+    /* 基礎設定：強制全螢幕與隱藏捲軸 */
+    body { 
+        margin: 0; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        background: #2c3e50; 
+        font-family: sans-serif; 
+        overflow: hidden; 
+        /* 防止 iOS 捲動反彈 */
+        overscroll-behavior: none;
+    }
+
+    /* 音樂按鈕樣式 */
+    #musicBtn {
+        position: absolute; 
+        top: 20px; 
+        right: 20px;
+        padding: 10px 20px; 
+        background-color: #27ae60; 
+        color: white;
+        border: none; 
+        border-radius: 5px; 
+        cursor: pointer;
+        font-size: 16px; 
+        z-index: 100; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        /* 防止點擊延遲 */
+        touch-action: manipulation;
+    }
+
+    .court {
+        width: 95vw; 
+        max-width: 900px; 
+        aspect-ratio: 2 / 1;
+        background-color: #d2a679; 
+        border: 5px solid white;
+        position: relative; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        border-radius: 10px; 
+        user-select: none; 
+        overflow: hidden;
+        /* 重要：開啟 GPU 加速 */
+        transform: translateZ(0);
+    }
+
+    /* 線條樣式 */
+    .line { position: absolute; border: 2px solid white; box-sizing: border-box; }
+    .mid-line { width: 2px; height: 100%; left: 50%; border: none; background: white; transform: translateX(-50%); }
+    .center-circle { width: 20%; aspect-ratio: 1/1; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid white; }
+    .key { width: 15%; height: 50%; border: 2px solid white; top: 25%; }
+    .key.left { left: 0; } .key.right { right: 0; }
+    .ft-circle { width: 15%; aspect-ratio: 1/1; border-radius: 50%; top: 50%; transform: translateY(-50%); border: 3px solid white; }
+    .ft-circle.left { left: 10%; } .ft-circle.right { right: 10%; }
+    .three-point { width: 30%; height: 80%; border: 3px solid white; top: 10%; position: absolute; }
+    .three-point.left { left: 0; border-radius: 0 100% 100% 0; border-left: none; }
+    .three-point.right { right: 0; border-radius: 100% 0 0 100%; border-right: none; }
+    .rim { width: 6%; aspect-ratio: 1/1; border: 3px solid #c0392b; border-radius: 50%; top: 42%; position: absolute; z-index: 5; }
+    .rim.left { left: 1%; } .rim.right { right: 1%; }
+
+    /* 物件樣式 - 終極優化版 */
+    .draggable {
+        position: absolute; 
+        width: 6%; 
+        aspect-ratio: 1 / 1;
+        cursor: grab; 
+        z-index: 10; 
+        border-radius: 50%;
+        border: 2px solid white; 
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        
+        /* --- 關鍵優化屬性 --- */
+        /* 1. 告訴瀏覽器這個元素會變形，提前優化 */
+        will-change: transform;
+        /* 2. 啟用硬體加速 (防止閃爍與殘影) */
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        /* 3. 讓動畫更平滑 */
+        transition: transform 0.05s linear, box-shadow 0.2s ease;
+        
+        /* 防止 iOS 高亮 */
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 按住時的狀態 */
+    .draggable:active {
+        cursor: grabbing;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        /* 按住時稍微放大一點點，確認選取 */
+        transform: scale(1.05) translateZ(0);
+    }
+
+    .red { background-color: #e74c3c; }
+    .blue { background-color: #3498db; }
+    .ball { background-color: #f39c12; border: 2px solid #d35400; z-index: 20; }
+</style>
