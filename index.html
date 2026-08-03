@@ -5,27 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>互動籃球戰術板</title>
     
-    <!-- Open Graph 設定 -->
+    <!-- Open Graph 設定 (Discord 預覽) -->
     <meta property="og:title" content="互動式籃球戰術板">
     <meta property="og:description" content="這是一個可以在手機與電腦上使用的互動式籃球戰術板。">
     <meta property="og:type" content="website">
 
     <style>
+        /* 基礎全域設定 */
         body { 
             margin: 0; display: flex; justify-content: center; align-items: center; 
             height: 100vh; background: #2c3e50; font-family: sans-serif; 
-            overflow: hidden; overscroll-behavior: none; touch-action: none;
+            overflow: hidden; 
+            /* 關鍵：徹底鎖死瀏覽器預設捲動行為，防止拖曳變形 */
+            overscroll-behavior: none; 
+            touch-action: none;
         }
+
         #musicBtn {
             position: absolute; top: 20px; right: 20px; padding: 10px 20px;
             background-color: #27ae60; color: white; border: none; border-radius: 5px;
             cursor: pointer; z-index: 100; touch-action: manipulation;
         }
+
         .court {
             width: 95vw; max-width: 900px; aspect-ratio: 2 / 1;
             background-color: #d2a679; border: 5px solid white; position: relative;
-            border-radius: 10px; user-select: none; overflow: hidden; transform: translateZ(0);
+            border-radius: 10px; user-select: none; overflow: hidden; 
+            /* GPU 加速 */
+            transform: translateZ(0);
         }
+
+        /* 繪圖樣式 */
         .line { position: absolute; border: 2px solid white; box-sizing: border-box; }
         .mid-line { width: 2px; height: 100%; left: 50%; border: none; background: white; transform: translateX(-50%); }
         .center-circle { width: 20%; aspect-ratio: 1/1; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid white; }
@@ -39,10 +49,13 @@
         .rim { width: 6%; aspect-ratio: 1/1; border: 3px solid #c0392b; border-radius: 50%; top: 42%; position: absolute; z-index: 5; }
         .rim.left { left: 1%; } .rim.right { right: 1%; }
         
+        /* 拖曳物件優化 */
         .draggable {
             position: absolute; width: 6%; aspect-ratio: 1 / 1; cursor: grab;
             z-index: 10; border-radius: 50%; border: 2px solid white;
-            will-change: transform; transform: translateZ(0);
+            /* 關鍵：防止閃爍與變形 */
+            will-change: transform; 
+            transform: translateZ(0);
             transition: transform 0.05s linear;
         }
         .red { background-color: #e74c3c; }
@@ -77,26 +90,36 @@
         let draggedElement = null;
         let offsetX, offsetY;
 
+        // 綁定事件
         document.querySelectorAll('.draggable').forEach(item => {
             item.addEventListener('pointerdown', function(e) {
                 draggedElement = this;
                 const rect = draggedElement.getBoundingClientRect();
                 offsetX = e.clientX - rect.left;
                 offsetY = e.clientY - rect.top;
+                draggedElement.style.zIndex = 100;
             });
         });
 
         document.addEventListener('pointermove', function(e) {
             if (draggedElement) {
                 const courtRect = document.querySelector('.court').getBoundingClientRect();
+                // 計算比例
                 let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
                 let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
+                
+                // 限制範圍 (0-96)
                 draggedElement.style.left = Math.max(0, Math.min(x, 96)) + '%';
                 draggedElement.style.top = Math.max(0, Math.min(y, 96)) + '%';
             }
         });
 
-        document.addEventListener('pointerup', () => draggedElement = null);
+        document.addEventListener('pointerup', function() {
+            if (draggedElement) {
+                draggedElement.style.zIndex = draggedElement.classList.contains('ball') ? 20 : 10;
+                draggedElement = null;
+            }
+        });
     </script>
 </body>
 </html>
