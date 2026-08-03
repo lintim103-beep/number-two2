@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業版籃球戰術板</title>
+    <title>互動籃球戰術板</title>
     <style>
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #2c3e50; font-family: sans-serif; overflow: hidden; }
+
+        /* 音樂按鈕樣式 */
+        #musicBtn {
+            position: absolute; top: 20px; right: 20px;
+            padding: 10px 20px; background-color: #27ae60; color: white;
+            border: none; border-radius: 5px; cursor: pointer;
+            font-size: 16px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #musicBtn:hover { background-color: #2ecc71; }
 
         .court {
             width: 90vw; max-width: 900px; aspect-ratio: 2 / 1;
@@ -14,31 +23,20 @@
             border-radius: 10px; user-select: none; overflow: hidden;
         }
 
-        /* --- 球場標線 --- */
+        /* 繪圖與物件樣式 (維持不變) */
         .line { position: absolute; border: 3px solid white; box-sizing: border-box; }
-        
-        /* 中線與中圈 */
         .mid-line { width: 3px; height: 100%; left: 50%; border: none; background: white; transform: translateX(-50%); }
         .center-circle { width: 20%; aspect-ratio: 1/1; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 3px solid white; }
-
-        /* 禁區 (Key Area) */
         .key { width: 15%; height: 50%; border: 3px solid white; top: 25%; }
         .key.left { left: 0; } .key.right { right: 0; }
-
-        /* 罰球圈 (Free Throw Circle) */
         .ft-circle { width: 15%; aspect-ratio: 1/1; border-radius: 50%; top: 50%; transform: translateY(-50%); border: 3px solid white; }
         .ft-circle.left { left: 10%; } .ft-circle.right { right: 10%; }
-
-        /* 三分線 (Three Point Arc) */
         .three-point { width: 30%; height: 80%; border: 3px solid white; top: 10%; position: absolute; }
         .three-point.left { left: 0; border-radius: 0 100% 100% 0; border-left: none; }
         .three-point.right { right: 0; border-radius: 100% 0 0 100%; border-right: none; }
-
-        /* 籃框 (Rim) */
         .rim { width: 6%; aspect-ratio: 1/1; border: 4px solid #c0392b; border-radius: 50%; top: 42%; position: absolute; z-index: 5; }
         .rim.left { left: 1%; } .rim.right { right: 1%; }
 
-        /* 物件樣式 */
         .draggable {
             position: absolute; width: 4%; aspect-ratio: 1 / 1;
             cursor: grab; touch-action: none; z-index: 10; border-radius: 50%;
@@ -51,8 +49,14 @@
 </head>
 <body>
 
+    <!-- 音樂播放器與按鈕 -->
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+        您的瀏覽器不支援音樂播放。
+    </audio>
+    <button id="musicBtn">播放音樂 🎵</button>
+
     <div class="court">
-        <!-- 線條區 -->
         <div class="line mid-line"></div>
         <div class="line center-circle"></div>
         <div class="line key left"></div><div class="line key right"></div>
@@ -60,26 +64,38 @@
         <div class="line three-point left"></div><div class="line three-point right"></div>
         <div class="rim left"></div><div class="rim right"></div>
 
-        <!-- 球員點 (百分比位置) -->
+        <!-- 球員點 (維持不變) -->
         <div class="draggable red" style="top: 20%; left: 15%;"></div>
         <div class="draggable red" style="top: 40%; left: 25%;"></div>
         <div class="draggable red" style="top: 60%; left: 15%;"></div>
         <div class="draggable red" style="top: 30%; left: 5%;"></div>
         <div class="draggable red" style="top: 50%; left: 5%;"></div>
-
         <div class="draggable blue" style="top: 20%; left: 80%;"></div>
         <div class="draggable blue" style="top: 40%; left: 70%;"></div>
         <div class="draggable blue" style="top: 60%; left: 80%;"></div>
         <div class="draggable blue" style="top: 30%; left: 90%;"></div>
         <div class="draggable blue" style="top: 50%; left: 90%;"></div>
-
         <div class="draggable ball" style="top: 50%; left: 50%;"></div>
     </div>
 
     <script>
+        // 音樂邏輯
+        const audio = document.getElementById('bgMusic');
+        const btn = document.getElementById('musicBtn');
+        
+        btn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "暫停音樂 ⏸️";
+            } else {
+                audio.pause();
+                btn.innerText = "播放音樂 🎵";
+            }
+        });
+
+        // 拖曳邏輯 (維持不變)
         let draggedElement = null;
         let offsetX, offsetY;
-
         document.querySelectorAll('.draggable').forEach(item => {
             item.addEventListener('pointerdown', function(e) {
                 draggedElement = this;
@@ -89,22 +105,17 @@
                 draggedElement.style.zIndex = 100;
             });
         });
-
         document.addEventListener('pointermove', function(e) {
             if (draggedElement) {
                 const courtRect = document.querySelector('.court').getBoundingClientRect();
                 let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
                 let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
-                
-                // 限制在球場內 (0-96% 避免球跑出邊界)
                 x = Math.max(0, Math.min(x, 96));
                 y = Math.max(0, Math.min(y, 96));
-                
                 draggedElement.style.left = x + '%';
                 draggedElement.style.top = y + '%';
             }
         });
-
         document.addEventListener('pointerup', function() {
             if (draggedElement) {
                 draggedElement.style.zIndex = (draggedElement.classList.contains('ball')) ? 20 : 10;
