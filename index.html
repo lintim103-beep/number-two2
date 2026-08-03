@@ -5,18 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>互動籃球戰術板</title>
     
-    <!-- Open Graph 設定 (Discord 預覽) -->
     <meta property="og:title" content="互動式籃球戰術板">
     <meta property="og:description" content="這是一個可以在手機與電腦上使用的互動式籃球戰術板。">
     <meta property="og:type" content="website">
 
     <style>
-        /* 基礎全域設定 */
         body { 
             margin: 0; display: flex; justify-content: center; align-items: center; 
             height: 100vh; background: #2c3e50; font-family: sans-serif; 
             overflow: hidden; 
-            /* 關鍵：徹底鎖死瀏覽器預設捲動行為，防止拖曳變形 */
             overscroll-behavior: none; 
             touch-action: none;
         }
@@ -31,11 +28,9 @@
             width: 95vw; max-width: 900px; aspect-ratio: 2 / 1;
             background-color: #d2a679; border: 5px solid white; position: relative;
             border-radius: 10px; user-select: none; overflow: hidden; 
-            /* GPU 加速 */
             transform: translateZ(0);
         }
 
-        /* 繪圖樣式 */
         .line { position: absolute; border: 2px solid white; box-sizing: border-box; }
         .mid-line { width: 2px; height: 100%; left: 50%; border: none; background: white; transform: translateX(-50%); }
         .center-circle { width: 20%; aspect-ratio: 1/1; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid white; }
@@ -49,14 +44,18 @@
         .rim { width: 6%; aspect-ratio: 1/1; border: 3px solid #c0392b; border-radius: 50%; top: 42%; position: absolute; z-index: 5; }
         .rim.left { left: 1%; } .rim.right { right: 1%; }
         
-        /* 拖曳物件優化 */
         .draggable {
             position: absolute; width: 6%; aspect-ratio: 1 / 1; cursor: grab;
             z-index: 10; border-radius: 50%; border: 2px solid white;
-            /* 關鍵：防止閃爍與變形 */
             will-change: transform; 
             transform: translateZ(0);
             transition: transform 0.05s linear;
+            
+            /* 修正後的防變形 CSS 規則 */
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
         .red { background-color: #e74c3c; }
         .blue { background-color: #3498db; }
@@ -90,7 +89,6 @@
         let draggedElement = null;
         let offsetX, offsetY;
 
-        // 綁定事件
         document.querySelectorAll('.draggable').forEach(item => {
             item.addEventListener('pointerdown', function(e) {
                 draggedElement = this;
@@ -104,11 +102,9 @@
         document.addEventListener('pointermove', function(e) {
             if (draggedElement) {
                 const courtRect = document.querySelector('.court').getBoundingClientRect();
-                // 計算比例
                 let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
                 let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
                 
-                // 限制範圍 (0-96)
                 draggedElement.style.left = Math.max(0, Math.min(x, 96)) + '%';
                 draggedElement.style.top = Math.max(0, Math.min(y, 96)) + '%';
             }
@@ -123,10 +119,3 @@
     </script>
 </body>
 </html>
-.draggable {
-    /* ...原本的設定... */
-    touch-action: none;          /* 強制禁止任何系統處理 */
-    user-select: none;           /* 禁止選取文字（防止變形） */
-    -webkit-user-select: none;   /* iOS Safari 專用 */
-    -webkit-touch-callout: none; /* 禁止 iOS 長按選單 */
-}
