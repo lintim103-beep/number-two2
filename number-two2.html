@@ -130,6 +130,285 @@
 
 </body>
 </html>
+    <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>全場籃球場與球員</title>
+    <style>
+        /* --------------------
+           球場基礎樣式 (同前一版)
+        -------------------- */
+        .court {
+            width: 800px;
+            height: 400px;
+            background-color: #d2a679;
+            border: 5px solid white;
+            margin: 50px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .mid-line {
+            width: 2px;
+            height: 100%;
+            background-color: white;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .center-circle {
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .key {
+            width: 120px;
+            height: 200px;
+            border: 3px solid white;
+            position: absolute;
+            top: 100px;
+        }
+        .key.left { left: 0; }
+        .key.right { right: 0; }
+
+        .free-throw-circle {
+            width: 120px;
+            height: 120px;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: 140px;
+        }
+        .free-throw-circle.left { left: 60px; }
+        .free-throw-circle.right { right: 60px; }
+
+        .hoop {
+            width: 10px;
+            height: 60px;
+            background-color: white;
+            position: absolute;
+            top: 170px;
+        }
+        .rim {
+            width: 30px;
+            height: 30px;
+            border: 3px solid red;
+            border-radius: 50%;
+            position: absolute;
+            top: 185px;
+        }
+        
+        .hoop.left { left: 0; }
+        .hoop.right { right: 0; }
+        .rim.left { left: 10px; }
+        .rim.right { right: 10px; }
+
+        /* --------------------
+           球員點樣式 (新增)
+        -------------------- */
+        .player {
+            width: 20px;           /* 圓點大小 */
+            height: 20px;
+            border-radius: 50%;    /* 變成圓形 */
+            position: absolute;    /* 絕對定位，相對於 .court */
+            border: 2px solid white; /* 白色外框讓點更明顯 */
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* 陰影立體感 */
+            z-index: 10;           /* 確保球員在線條上方 */
+            cursor: default;       /* 滑鼠移上去顯示預設游標 */
+        }
+
+        /* 紅隊球員 (進攻方) - 範例佈陣在左半場 */
+        .player.red {
+            background-color: #ff4d4d; /* 亮紅色 */
+        }
+
+        /* 藍隊球員 (防守方) - 範例佈陣在右半場 */
+        .player.blue {
+            background-color: #4d94ff; /* 亮藍色 */
+        }
+
+        /* --------------------
+           個別球員定位 (用 top 和 left 精確調整位置)
+           注意：球場寬800px，高400px
+        -------------------- */
+        
+        /* --- 紅隊 (進攻) --- */
+        /* 1號 (控球後衛 - 弧頂) */
+        .p1 { top: 190px; left: 180px; } 
+        /* 2號 (得分後衛 - 右側45度) */
+        .p2 { top: 110px; left: 250px; }
+        /* 3號 (小前鋒 - 左側底角) */
+        .p3 { top: 350px; left: 50px; }
+        /* 4號 (大前鋒 - 罰球線) */
+        .p4 { top: 230px; left: 100px; }
+        /* 5號 (中鋒 - 禁區深處) */
+        .p5 { top: 280px; left: 30px; }
+
+        /* --- 藍隊 (防守) --- */
+        /* 1號 (防守控球) */
+        .p6 { top: 190px; left: 230px; }
+        /* 2號 (防守得分) */
+        .p7 { top: 125px; left: 280px; }
+        /* 3號 (防守底角) */
+        .p8 { top: 330px; left: 750px; }
+        /* 4號 (防守罰球線) */
+        .p9 { top: 230px; left: 680px; }
+        /* 5號 (防守禁區) */
+        .p10 { top: 200px; left: 750px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="court">
+        <!-- 中場設施 -->
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+
+        <!-- 左側進攻端 -->
+        <div class="hoop left"></div>
+        <div class="rim left"></div>
+        <div class="key left"></div>
+        <div class="free-throw-circle left"></div>
+
+        <!-- 右側進攻端 -->
+        <div class="hoop right"></div>
+        <div class="rim right"></div>
+        <div class="key right"></div>
+        <div class="free-throw-circle right"></div>
+
+        <!-- --------------------
+             球員點 (HTML 結構)
+        -------------------- -->
+        <!-- 紅隊球員 (進攻) -->
+        <div class="player red p1" title="PG - #1"></div>
+        <div class="player red p2" title="SG - #2"></div>
+        <div class="player red p3" title="SF - #3"></div>
+        <div class="player red p4" title="PF - #4"></div>
+        <div class="player red p5" title="C - #5"></div>
+
+        <!-- 藍隊球員 (防守) -->
+        <div class="player blue p6" title="Def PG"></div>
+        <div class="player blue p7" title="Def SG"></div>
+        <div class="player blue p8" title="Def SF"></div>
+        <div class="player blue p9" title="Def PF"></div>
+        <div class="player blue p10" title="Def C"></div>
+
+    </div>
+
+</body>
+</html>
+    <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>互動式籃球戰術板</title>
+    <style>
+        /* 球場樣式保持不變 */
+        .court {
+            width: 800px;
+            height: 400px;
+            background-color: #d2a679;
+            border: 5px solid white;
+            margin: 50px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            user-select: none; /* 防止拖曳時文字被選取 */
+        }
+
+        /* 繪製球場線條 (略過，與之前相同) */
+        .mid-line { width: 2px; height: 100%; background-color: white; position: absolute; left: 50%; transform: translateX(-50%); }
+        .center-circle { width: 100px; height: 100px; border: 2px solid white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .key { width: 120px; height: 200px; border: 3px solid white; position: absolute; top: 100px; }
+        .key.left { left: 0; } .key.right { right: 0; }
+        .free-throw-circle { width: 120px; height: 120px; border: 3px solid white; border-radius: 50%; position: absolute; top: 140px; }
+        .free-throw-circle.left { left: 60px; } .free-throw-circle.right { right: 60px; }
+        .rim { width: 30px; height: 30px; border: 3px solid red; border-radius: 50%; position: absolute; top: 185px; }
+        .rim.left { left: 10px; } .rim.right { left: 760px; }
+
+        /* 球員樣式 */
+        .player {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            border: 2px solid white;
+            cursor: grab; /* 顯示為可以抓取的手勢 */
+            touch-action: none; /* 防止觸控時誤觸捲動頁面 */
+            z-index: 10;
+        }
+        .player:active { cursor: grabbing; } /* 抓取時的手勢 */
+        .red { background-color: #ff4d4d; }
+        .blue { background-color: #4d94ff; }
+    </style>
+</head>
+<body>
+
+    <div class="court" id="court">
+        <!-- 畫線 -->
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+        <div class="key left"></div><div class="key right"></div>
+        <div class="free-throw-circle left"></div><div class="free-throw-circle right"></div>
+        <div class="rim left"></div><div class="rim right"></div>
+
+        <!-- 球員 -->
+        <div class="player red" style="top: 190px; left: 180px;"></div>
+        <div class="player red" style="top: 110px; left: 250px;"></div>
+        <div class="player red" style="top: 350px; left: 50px;"></div>
+        <div class="player red" style="top: 230px; left: 100px;"></div>
+        <div class="player red" style="top: 280px; left: 30px;"></div>
+
+        <div class="player blue" style="top: 190px; left: 230px;"></div>
+        <div class="player blue" style="top: 125px; left: 280px;"></div>
+        <div class="player blue" style="top: 330px; left: 750px;"></div>
+        <div class="player blue" style="top: 230px; left: 680px;"></div>
+        <div class="player blue" style="top: 200px; left: 750px;"></div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let offsetX, offsetY;
+
+        // 監聽所有球員的點擊
+        document.querySelectorAll('.player').forEach(player => {
+            player.addEventListener('pointerdown', function(e) {
+                draggedElement = this;
+                // 計算滑鼠在球員圓點內部的相對位置
+                offsetX = e.clientX - draggedElement.offsetLeft;
+                offsetY = e.clientY - draggedElement.offsetTop;
+                draggedElement.style.zIndex = 100; // 拖動時置於最上層
+            });
+        });
+
+        // 監聽整個頁面的滑動與放開
+        document.addEventListener('pointermove', function(e) {
+            if (draggedElement) {
+                // 更新位置
+                draggedElement.style.left = (e.clientX - offsetX) + 'px';
+                draggedElement.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('pointerup', function() {
+            if (draggedElement) {
+                draggedElement.style.zIndex = 10;
+                draggedElement = null;
+            }
+        });
+    </script>
+</body>
+</html>
 
 </body>
 </html>
