@@ -1,0 +1,33 @@
+import pygame
+import sys
+
+# 1. 初始化 Pygame
+pygame.init()
+
+# 2. 設定視窗參數
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+# 定義顏色：RGB 格式 (紅, 綠, 藍)
+BLUE_SKY = (50, 150, 255) 
+
+# 創建視窗
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("我的射擊遊戲")
+
+# 3. 遊戲主迴圈
+running = True
+while running:
+    # 檢查是否點擊關閉視窗
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # 填滿背景顏色
+    screen.fill(BLUE_SKY)
+
+    # 更新畫面顯示
+    pygame.display.flip()
+
+# 結束程式
+pygame.quit()
+sys.exit()
