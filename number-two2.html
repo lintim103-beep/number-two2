@@ -2,50 +2,34 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>藍色背景網頁</title>
+    <title>置中籃球戰術板</title>
     <style>
-        /* 1. 設定 html 與 body 高度為 100%，並移除邊距 */
+        /* 1. 設定滿版頁面，並使用 Flexbox 垂直水平置中 */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center; /* 水平置中 */
+            align-items: center;     /* 垂直置中 */
+            background: linear-gradient(to bottom, #00c6ff, #0072ff);
+            background-attachment: fixed;
         }
 
-        body {
-            /* 2. 設定漸層背景 */
-            background: linear-gradient(to bottom, #00c6ff, #0072ff);
-            
-            /* 3. 重要：固定背景，防止捲動時出現重複或留白 */
-            background-attachment: fixed;
-            
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <h1></h1>
-</body>
-</html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>互動式籃球戰術板</title>
-    <style>
         .court {
             width: 800px;
             height: 400px;
             background-color: #d2a679;
             border: 5px solid white;
-            margin: 50px auto;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             user-select: none;
+            /* 移除舊有的 margin，現在交給 body 的 flexbox 控制 */
+            margin: 0; 
         }
 
-        /* 球場繪製 (保持不變) */
+        /* 以下樣式維持不變 */
         .mid-line { width: 2px; height: 100%; background-color: white; position: absolute; left: 50%; transform: translateX(-50%); }
         .center-circle { width: 100px; height: 100px; border: 2px solid white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         .key { width: 120px; height: 200px; border: 3px solid white; position: absolute; top: 100px; }
@@ -55,33 +39,11 @@
         .rim { width: 30px; height: 30px; border: 3px solid red; border-radius: 50%; position: absolute; top: 185px; }
         .rim.left { left: 10px; } .rim.right { left: 760px; }
 
-        /* 通用拖曳物件樣式 */
-        .draggable {
-            position: absolute;
-            cursor: grab;
-            touch-action: none;
-            z-index: 10;
-        }
-
-        /* 球員樣式 */
-        .player {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
+        .draggable { position: absolute; cursor: grab; touch-action: none; z-index: 10; }
+        .player { width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; }
         .red { background-color: #ff4d4d; }
         .blue { background-color: #4d94ff; }
-
-        /* 籃球樣式 */
-        .ball {
-            width: 20px;
-            height: 20px;
-            background-color: orange;
-            border-radius: 50%;
-            border: 1px solid #d35400; /* 加點邊框讓球看起來更立體 */
-            z-index: 20; /* 讓球在球員上方 */
-        }
+        .ball { width: 20px; height: 20px; background-color: orange; border-radius: 50%; border: 1px solid #d35400; z-index: 20; }
     </style>
 </head>
 <body>
@@ -94,14 +56,12 @@
         <div class="free-throw-circle left"></div><div class="free-throw-circle right"></div>
         <div class="rim left"></div><div class="rim right"></div>
 
-        <!-- 球員 (紅隊) -->
+        <!-- 球員 -->
         <div class="draggable player red" style="top: 190px; left: 180px;"></div>
         <div class="draggable player red" style="top: 110px; left: 250px;"></div>
         <div class="draggable player red" style="top: 350px; left: 50px;"></div>
         <div class="draggable player red" style="top: 230px; left: 100px;"></div>
         <div class="draggable player red" style="top: 280px; left: 30px;"></div>
-
-        <!-- 球員 (藍隊) -->
         <div class="draggable player blue" style="top: 190px; left: 230px;"></div>
         <div class="draggable player blue" style="top: 125px; left: 280px;"></div>
         <div class="draggable player blue" style="top: 330px; left: 750px;"></div>
@@ -116,20 +76,398 @@
         let draggedElement = null;
         let offsetX, offsetY;
 
-        // 監聽所有具備 .draggable 類別的元素 (球員與籃球)
         document.querySelectorAll('.draggable').forEach(item => {
             item.addEventListener('pointerdown', function(e) {
                 draggedElement = this;
-                offsetX = e.clientX - draggedElement.offsetLeft;
-                offsetY = e.clientY - draggedElement.offsetTop;
-                draggedElement.style.zIndex = 100; // 拖動時拉到最上層
+                // 注意：這裡計算位置時，要考慮到 .court 容器的位移
+                const rect = draggedElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                draggedElement.style.zIndex = 100;
             });
         });
 
         document.addEventListener('pointermove', function(e) {
             if (draggedElement) {
-                draggedElement.style.left = (e.clientX - offsetX) + 'px';
-                draggedElement.style.top = (e.clientY - offsetY) + 'px';
+                const courtRect = document.querySelector('.court').getBoundingClientRect();
+                // 限制球與球員不能拖出球場外 (選用)
+                let x = e.clientX - courtRect.left - offsetX;
+                let y = e.clientY - courtRect.top - offsetY;
+                draggedElement.style.left = x + 'px';
+                draggedElement.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('pointerup', function() {
+            if (draggedElement) {
+                draggedElement.style.zIndex = (draggedElement.classList.contains('ball')) ? 20 : 10;
+                draggedElement = null;
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <!-- 關鍵：讓手機正確縮放頁面 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手機版籃球戰術板</title>
+    <style>
+        /* 基礎設定 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #00c6ff, #0072ff);
+            background-attachment: fixed;
+            overflow: hidden; /* 防止手機拖動時捲動頁面 */
+        }
+
+        .court {
+            /* 手機板核心：寬度最大 100%，並設定長寬比例 */
+            width: 95%;
+            max-width: 800px;
+            aspect-ratio: 2 / 1;
+            background-color: #d2a679;
+            border: 5px solid white;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            user-select: none;
+            /* 讓內容物隨容器縮放 */
+            overflow: hidden; 
+        }
+
+        /* 繪製線條 (使用百分比讓線條保持相對位置) */
+        .mid-line { width: 2px; height: 100%; background-color: white; position: absolute; left: 50%; transform: translateX(-50%); }
+        .center-circle { width: 25%; height: 50%; border: 2px solid white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .key { width: 15%; height: 50%; border: 3px solid white; position: absolute; top: 25%; }
+        .key.left { left: 0; } .key.right { right: 0; }
+        .rim { width: 7.5%; height: 15%; border: 3px solid red; border-radius: 50%; position: absolute; top: 42.5%; }
+        .rim.left { left: 2.5%; } .rim.right { right: 2.5%; }
+
+        /* 拖曳物件 (尺寸用百分比，這樣在手機上比例才對) */
+        .draggable {
+            position: absolute;
+            width: 5%; /* 圓點佔球場寬度的 5% */
+            aspect-ratio: 1 / 1;
+            cursor: grab;
+            touch-action: none;
+            z-index: 10;
+            border-radius: 50%;
+        }
+        
+        .player { border: 2px solid white; }
+        .red { background-color: #ff4d4d; }
+        .blue { background-color: #4d94ff; }
+        .ball { background-color: orange; border: 1px solid #d35400; z-index: 20; }
+    </style>
+</head>
+<body>
+
+    <div class="court">
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+        <div class="key left"></div><div class="key right"></div>
+        <div class="rim left"></div><div class="rim right"></div>
+
+        <!-- 使用百分比定位 (top/left) 讓位置在不同手機螢幕上保持一樣 -->
+        <div class="draggable player red" style="top: 45%; left: 20%;"></div>
+        <div class="draggable player red" style="top: 25%; left: 30%;"></div>
+        <div class="draggable player red" style="top: 80%; left: 10%;"></div>
+        <div class="draggable player red" style="top: 55%; left: 15%;"></div>
+        <div class="draggable player red" style="top: 65%; left: 5%;"></div>
+
+        <div class="draggable player blue" style="top: 45%; left: 30%;"></div>
+        <div class="draggable player blue" style="top: 30%; left: 35%;"></div>
+        <div class="draggable player blue" style="top: 80%; left: 90%;"></div>
+        <div class="draggable player blue" style="top: 55%; left: 80%;"></div>
+        <div class="draggable player blue" style="top: 45%; left: 90%;"></div>
+
+        <div class="draggable ball" style="top: 50%; left: 25%;"></div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let offsetX, offsetY;
+
+        document.querySelectorAll('.draggable').forEach(item => {
+            item.addEventListener('pointerdown', function(e) {
+                draggedElement = this;
+                const rect = draggedElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                draggedElement.style.zIndex = 100;
+            });
+        });
+
+        document.addEventListener('pointermove', function(e) {
+            if (draggedElement) {
+                const courtRect = document.querySelector('.court').getBoundingClientRect();
+                
+                // 計算比例座標 (將數值轉為百分比)
+                let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
+                let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
+                
+                // 限制在球場內
+                x = Math.max(0, Math.min(x, 95));
+                y = Math.max(0, Math.min(y, 95));
+                
+                draggedElement.style.left = x + '%';
+                draggedElement.style.top = y + '%';
+            }
+        });
+
+        document.addEventListener('pointerup', function() {
+            if (draggedElement) {
+                draggedElement.style.zIndex = (draggedElement.classList.contains('ball')) ? 20 : 10;
+                draggedElement = null;
+            }
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <!-- 關鍵：讓手機正確縮放頁面 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手機版籃球戰術板</title>
+    <style>
+        /* 基礎設定 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #00c6ff, #0072ff);
+            background-attachment: fixed;
+            overflow: hidden; /* 防止手機拖動時捲動頁面 */
+        }
+
+        .court {
+            /* 手機板核心：寬度最大 100%，並設定長寬比例 */
+            width: 95%;
+            max-width: 800px;
+            aspect-ratio: 2 / 1;
+            background-color: #d2a679;
+            border: 5px solid white;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            user-select: none;
+            /* 讓內容物隨容器縮放 */
+            overflow: hidden; 
+        }
+
+        /* 繪製線條 (使用百分比讓線條保持相對位置) */
+        .mid-line { width: 2px; height: 100%; background-color: white; position: absolute; left: 50%; transform: translateX(-50%); }
+        .center-circle { width: 25%; height: 50%; border: 2px solid white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .key { width: 15%; height: 50%; border: 3px solid white; position: absolute; top: 25%; }
+        .key.left { left: 0; } .key.right { right: 0; }
+        .rim { width: 7.5%; height: 15%; border: 3px solid red; border-radius: 50%; position: absolute; top: 42.5%; }
+        .rim.left { left: 2.5%; } .rim.right { right: 2.5%; }
+
+        /* 拖曳物件 (尺寸用百分比，這樣在手機上比例才對) */
+        .draggable {
+            position: absolute;
+            width: 5%; /* 圓點佔球場寬度的 5% */
+            aspect-ratio: 1 / 1;
+            cursor: grab;
+            touch-action: none;
+            z-index: 10;
+            border-radius: 50%;
+        }
+        
+        .player { border: 2px solid white; }
+        .red { background-color: #ff4d4d; }
+        .blue { background-color: #4d94ff; }
+        .ball { background-color: orange; border: 1px solid #d35400; z-index: 20; }
+    </style>
+</head>
+<body>
+
+    <div class="court">
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+        <div class="key left"></div><div class="key right"></div>
+        <div class="rim left"></div><div class="rim right"></div>
+
+        <!-- 使用百分比定位 (top/left) 讓位置在不同手機螢幕上保持一樣 -->
+        <div class="draggable player red" style="top: 45%; left: 20%;"></div>
+        <div class="draggable player red" style="top: 25%; left: 30%;"></div>
+        <div class="draggable player red" style="top: 80%; left: 10%;"></div>
+        <div class="draggable player red" style="top: 55%; left: 15%;"></div>
+        <div class="draggable player red" style="top: 65%; left: 5%;"></div>
+
+        <div class="draggable player blue" style="top: 45%; left: 30%;"></div>
+        <div class="draggable player blue" style="top: 30%; left: 35%;"></div>
+        <div class="draggable player blue" style="top: 80%; left: 90%;"></div>
+        <div class="draggable player blue" style="top: 55%; left: 80%;"></div>
+        <div class="draggable player blue" style="top: 45%; left: 90%;"></div>
+
+        <div class="draggable ball" style="top: 50%; left: 25%;"></div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let offsetX, offsetY;
+
+        document.querySelectorAll('.draggable').forEach(item => {
+            item.addEventListener('pointerdown', function(e) {
+                draggedElement = this;
+                const rect = draggedElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                draggedElement.style.zIndex = 100;
+            });
+        });
+
+        document.addEventListener('pointermove', function(e) {
+            if (draggedElement) {
+                const courtRect = document.querySelector('.court').getBoundingClientRect();
+                
+                // 計算比例座標 (將數值轉為百分比)
+                let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
+                let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
+                
+                // 限制在球場內
+                x = Math.max(0, Math.min(x, 95));
+                y = Math.max(0, Math.min(y, 95));
+                
+                draggedElement.style.left = x + '%';
+                draggedElement.style.top = y + '%';
+            }
+        });
+
+        document.addEventListener('pointerup', function() {
+            if (draggedElement) {
+                draggedElement.style.zIndex = (draggedElement.classList.contains('ball')) ? 20 : 10;
+                draggedElement = null;
+            }
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>互動籃球戰術板</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        .court {
+            width: 90vw;
+            max-width: 900px; /* 電腦版最大限制 */
+            aspect-ratio: 2 / 1;
+            background-color: #d2a679;
+            border: 8px solid white;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            user-select: none;
+        }
+
+        /* 球場線條與設計 */
+        .mid-line { width: 4px; height: 100%; background-color: white; position: absolute; left: 50%; transform: translateX(-50%); }
+        .center-circle { width: 20%; aspect-ratio: 1/1; border: 4px solid white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .key { width: 12%; height: 50%; border: 4px solid white; position: absolute; top: 25%; }
+        .key.left { left: 0; } .key.right { right: 0; }
+        .rim { width: 6%; aspect-ratio: 1/1; border: 4px solid red; border-radius: 50%; position: absolute; top: 42%; }
+        .rim.left { left: 2%; } .rim.right { right: 2%; }
+
+        /* 物件通用樣式 */
+        .draggable {
+            position: absolute;
+            width: 5%;
+            aspect-ratio: 1 / 1;
+            cursor: grab;
+            touch-action: none;
+            z-index: 10;
+            border-radius: 50%;
+            transition: transform 0.1s ease; /* 輕微動態效果 */
+        }
+        
+        /* 電腦版游標效果 */
+        .draggable:hover {
+            transform: scale(1.1); /* 滑鼠滑過放大 */
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .draggable:active { cursor: grabbing; }
+
+        .player { border: 2px solid white; }
+        .red { background-color: #e74c3c; }
+        .blue { background-color: #3498db; }
+        .ball { background-color: #f39c12; border: 2px solid #d35400; z-index: 20; }
+    </style>
+</head>
+<body>
+
+    <div class="court">
+        <div class="mid-line"></div>
+        <div class="center-circle"></div>
+        <div class="key left"></div><div class="key right"></div>
+        <div class="rim left"></div><div class="rim right"></div>
+
+        <!-- 球員點 (百分比位置) -->
+        <div class="draggable player red" style="top: 20%; left: 15%;"></div>
+        <div class="draggable player red" style="top: 40%; left: 25%;"></div>
+        <div class="draggable player red" style="top: 60%; left: 15%;"></div>
+        <div class="draggable player red" style="top: 30%; left: 5%;"></div>
+        <div class="draggable player red" style="top: 50%; left: 5%;"></div>
+
+        <div class="draggable player blue" style="top: 20%; left: 80%;"></div>
+        <div class="draggable player blue" style="top: 40%; left: 70%;"></div>
+        <div class="draggable player blue" style="top: 60%; left: 80%;"></div>
+        <div class="draggable player blue" style="top: 30%; left: 90%;"></div>
+        <div class="draggable player blue" style="top: 50%; left: 90%;"></div>
+
+        <!-- 籃球 -->
+        <div class="draggable ball" style="top: 50%; left: 50%;"></div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let offsetX, offsetY;
+
+        document.querySelectorAll('.draggable').forEach(item => {
+            item.addEventListener('pointerdown', function(e) {
+                draggedElement = this;
+                const rect = draggedElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                draggedElement.style.zIndex = 100;
+            });
+        });
+
+        document.addEventListener('pointermove', function(e) {
+            if (draggedElement) {
+                const courtRect = document.querySelector('.court').getBoundingClientRect();
+                // 計算並限制在 0-95% 範圍內，確保不跑出界
+                let x = ((e.clientX - courtRect.left - offsetX) / courtRect.width) * 100;
+                let y = ((e.clientY - courtRect.top - offsetY) / courtRect.height) * 100;
+                
+                x = Math.max(0, Math.min(x, 95));
+                y = Math.max(0, Math.min(y, 95));
+                
+                draggedElement.style.left = x + '%';
+                draggedElement.style.top = y + '%';
             }
         });
 
